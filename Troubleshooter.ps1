@@ -1,0 +1,6 @@
+#requires -Version 5.1
+<# Created by Dewald Pretorius #>
+param([string]$OutputPath)
+if(-not $OutputPath){$OutputPath="$([Environment]::GetFolderPath('Desktop'))\Word_Template_Addin_Reports"};New-Item $OutputPath -ItemType Directory -Force|Out-Null
+$normal="$env:APPDATA\Microsoft\Templates\Normal.dotm";$startup="$env:APPDATA\Microsoft\Word\STARTUP";$addins=Get-ChildItem 'HKCU:\Software\Microsoft\Office\Word\Addins','HKLM:\Software\Microsoft\Office\Word\Addins' -ErrorAction SilentlyContinue|Select-Object PSChildName,PSPath
+@('WORD TEMPLATE AND ADD-IN TROUBLESHOOTER','Created by Dewald Pretorius',"Generated: $(Get-Date)","Normal.dotm: $normal", "Exists: $(Test-Path $normal)",'Startup files:',(Get-ChildItem $startup -File -ErrorAction SilentlyContinue|Format-Table Name,Length,LastWriteTime|Out-String -Width 220),'Add-ins:',($addins|Format-Table -AutoSize|Out-String -Width 220),'Guidance: compare Safe Mode, rename Normal.dotm after backup, and disable add-ins one at a time.')|Set-Content (Join-Path $OutputPath 'Report.txt') -Encoding UTF8
